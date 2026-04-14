@@ -381,3 +381,33 @@ window.addEventListener("online", enviar);
 
 </body>
 </html>
+
+
+import { serve } from "https://deno.land/std/http/server.ts";
+
+serve(async (req) => {
+  const data = await req.json();
+
+  await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Authorization": "Bearer SUA_RESEND_API_KEY",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      from: "Sistema <onboarding@resend.dev>",
+      to: ["gbsilva@konatransportes.com.br"],
+      subject: `Protocolo de Conferência - ${data.rota}`,
+      text: `
+Nome: ${data.nome}
+Matrícula: ${data.matricula}
+Responsável: ${data.responsavel}
+Rota: ${data.rota}
+Loja: ${data.loja}
+Ocorrências: ${data.ocorrencias}
+      `,
+    }),
+  });
+
+  return new Response("ok");
+});
