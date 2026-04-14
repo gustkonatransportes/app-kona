@@ -355,11 +355,6 @@ async function enviar() {
   }
 }
 window.addEventListener("online", enviar);
-</script>
-
-</body>
-</html>
-
 import { serve } from "https://deno.land/std/http/server.ts";
 
 serve(async (req) => {
@@ -387,3 +382,7 @@ Obs: ${data.obs}
 
   return new Response("ok");
 });
+</script>
+
+</body>
+</html>
