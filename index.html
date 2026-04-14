@@ -382,7 +382,6 @@ window.addEventListener("online", enviar);
 </body>
 </html>
 
-
 import { serve } from "https://deno.land/std/http/server.ts";
 
 serve(async (req) => {
@@ -391,11 +390,11 @@ serve(async (req) => {
   await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzZnhrZWp2YmdwaHRlaW14dnVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwOTI0NTYsImV4cCI6MjA5MTY2ODQ1Nn0.39AD0Eb2NQphxMl0sS3pRDQ5uGyyOwHCHmiJdHRpkp8",
+      "Authorization": "Bearer re_D7ooU48r_MEghMStVqUKwTGqjfWhHqsSR",
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Sistema <onboarding@resend.dev>",
+      from: "KONA <onboarding@resend.dev>",
       to: ["gbsilva@konatransportes.com.br"],
       subject: `Protocolo - ${data.rota}`,
       text: `
