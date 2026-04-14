@@ -391,20 +391,19 @@ serve(async (req) => {
   await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
-      "Authorization": "Bearer SUA_RESEND_API_KEY",
+      "Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzZnhrZWp2YmdwaHRlaW14dnVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwOTI0NTYsImV4cCI6MjA5MTY2ODQ1Nn0.39AD0Eb2NQphxMl0sS3pRDQ5uGyyOwHCHmiJdHRpkp8",
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
       from: "Sistema <onboarding@resend.dev>",
       to: ["gbsilva@konatransportes.com.br"],
-      subject: `Protocolo de Conferência - ${data.rota}`,
+      subject: `Protocolo - ${data.rota}`,
       text: `
-Nome: ${data.nome}
+Conferente: ${data.conferente}
 Matrícula: ${data.matricula}
-Responsável: ${data.responsavel}
+Responsável: ${data.resp}
 Rota: ${data.rota}
-Loja: ${data.loja}
-Ocorrências: ${data.ocorrencias}
+Obs: ${data.obs}
       `,
     }),
   });
