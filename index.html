@@ -292,33 +292,55 @@ const r = {
 }
 
 /* ENVIAR */
-async function enviar() {
+async function enviar(){
+
+  const lojas = [];
+
+  document.querySelectorAll(".lojaBox").forEach(l => {
+
+    const ocorrencias = [];
+
+    l.querySelectorAll(".occItem").forEach(o => {
+      ocorrencias.push({
+        oco:o.querySelector(".oco").value,
+        cod:o.querySelector(".cod").value,
+        desc:o.querySelector(".desc").value,
+        qtde:o.querySelector(".qtde").value
+      });
+    });
+
+    lojas.push({
+      loja:l.querySelector(".loja").value,
+      ocorrencias
+    });
+
+  });
 
   const r = {
-    conferente: conferente.value,
-    matricula: matricula.value,
-    resp: resp.value,
-    data: data.value,
-    operador: operador.value,
-    rota: rota.value,
-    inicio_conf: inicio_conf.value,
-    fim_conf: fim_conf.value,
-    inicio_carreg: inicio_carreg.value,
-    fim_carreg: fim_carreg.value,
+    conferente:conferente.value,
+    matricula:matricula.value,
+    resp:resp.value,
+    data:data.value,
+    operador:operador.value,
+    rota:rota.value,
+    inicio_conf:inicio_conf.value,
+    fim_conf:fim_conf.value,
+    inicio_carreg:inicio_carreg.value,
+    fim_carreg:fim_carreg.value,
     temperatura: temp_check.value,
-    cong: cong.value,
-    resf: resf.value,
-    mr: mr.value,
-    doce: doce.value,
-    seco: seco.value,
-    motivo: motivo.value,
-    obs: obs.value,
-    status: "enviado"
+    cong:cong.value,
+    resf:resf.value,
+    mr:mr.value,
+    doce:doce.value,
+    seco:seco.value,
+    motivo:motivo.value,
+    obs:obs.value,
+    lojas:lojas,
+    status:"enviado"
   };
 
   try {
 
-    // SALVA NO BANCO
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/registros_operacao`,
       {
@@ -326,62 +348,35 @@ async function enviar() {
         headers: {
           "apikey": SUPABASE_KEY,
           "Authorization": `Bearer ${SUPABASE_KEY}`,
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Prefer": "return=representation"
         },
         body: JSON.stringify(r)
       }
     );
 
-    if (!res.ok) throw new Error(await res.text());
+    const text = await res.text();
 
-    // ENVIA EMAIL (EDGE FUNCTION)
-    await fetch(`${SUPABASE_URL}/functions/v1/send-protocolo-email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(r)
-    });
+    console.log("STATUS:", res.status);
+    console.log("RESPOSTA:", text);
+
+    if(!res.ok){
+      throw new Error(text);
+    }
 
     statusEl.innerText = "✔ Enviado com sucesso!";
 
+    // 🔥 LIMPA FORMULÁRIO
     document.querySelectorAll("input, textarea").forEach(i => i.value = "");
     document.getElementById("lojas").innerHTML = "";
 
-  } catch (e) {
-    console.log(e);
-    statusEl.innerText = "❌ Erro ao enviar";
+  } catch(e){
+    console.log("ERRO:", e);
+    statusEl.innerText = "❌ Erro ao enviar!";
   }
-} 
+}
 
 window.addEventListener("online", enviar);
-import { serve } from "https://deno.land/std/http/server.ts";
-
-serve(async (req) => {
-  const data = await req.json();
-
-  await fetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      "Authorization": "Bearer re_URz1thX4_KJWndVL3hdj8M37SBpupAfcB",
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: "KONA <onboarding@resend.dev>",
-      to: ["gbsilva@konatransportes.com.br"],
-      subject: `Protocolo - ${data.rota}`,
-      text: `
-Conferente: ${data.conferente}
-Matrícula: ${data.matricula}
-Responsável: ${data.resp}
-Rota: ${data.rota}
-Obs: ${data.obs}
-      `,
-    }),
-  });
-
-  return new Response("ok");
-});
 </script>
 
 </body>
