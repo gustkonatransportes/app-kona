@@ -292,7 +292,7 @@ const r = {
 }
 
 /* ENVIAR */
-async function enviar(){
+async function enviar() {
 
   const lojas = [];
 
@@ -302,41 +302,41 @@ async function enviar(){
 
     l.querySelectorAll(".occItem").forEach(o => {
       ocorrencias.push({
-        oco:o.querySelector(".oco").value,
-        cod:o.querySelector(".cod").value,
-        desc:o.querySelector(".desc").value,
-        qtde:o.querySelector(".qtde").value
+        oco: o.querySelector(".oco")?.value || "",
+        cod: o.querySelector(".cod")?.value || "",
+        desc: o.querySelector(".desc")?.value || "",
+        qtde: o.querySelector(".qtde")?.value || ""
       });
     });
 
     lojas.push({
-      loja:l.querySelector(".loja").value,
+      loja: l.querySelector(".loja")?.value || "",
       ocorrencias
     });
 
   });
 
   const r = {
-    conferente:conferente.value,
-    matricula:matricula.value,
-    resp:resp.value,
-    data:data.value,
-    operador:operador.value,
-    rota:rota.value,
-    inicio_conf:inicio_conf.value,
-    fim_conf:fim_conf.value,
-    inicio_carreg:inicio_carreg.value,
-    fim_carreg:fim_carreg.value,
+    conferente: conferente.value,
+    matricula: matricula.value,
+    resp: resp.value,
+    data: data.value,
+    operador: operador.value,
+    rota: rota.value,
+    inicio_conf: inicio_conf.value,
+    fim_conf: fim_conf.value,
+    inicio_carreg: inicio_carreg.value,
+    fim_carreg: fim_carreg.value,
     temperatura: temp_check.value,
-    cong:cong.value,
-    resf:resf.value,
-    mr:mr.value,
-    doce:doce.value,
-    seco:seco.value,
-    motivo:motivo.value,
-    obs:obs.value,
-    lojas:lojas,
-    status:"enviado"
+    cong: cong.value,
+    resf: resf.value,
+    mr: mr.value,
+    doce: doce.value,
+    seco: seco.value,
+    motivo: motivo.value,
+    obs: obs.value,
+    lojas: lojas,
+    status: "enviado"
   };
 
   try {
@@ -356,23 +356,18 @@ async function enviar(){
     );
 
     const text = await res.text();
-
-    console.log("STATUS:", res.status);
     console.log("RESPOSTA:", text);
 
-    if(!res.ok){
-      throw new Error(text);
-    }
+    if (!res.ok) throw new Error(text);
 
     statusEl.innerText = "✔ Enviado com sucesso!";
 
-    // 🔥 LIMPA FORMULÁRIO
     document.querySelectorAll("input, textarea").forEach(i => i.value = "");
     document.getElementById("lojas").innerHTML = "";
 
-  } catch(e){
-    console.log("ERRO:", e);
-    statusEl.innerText = "❌ Erro ao enviar!";
+  } catch (e) {
+    console.log(e);
+    statusEl.innerText = "❌ Erro ao enviar";
   }
 }
 
