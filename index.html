@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>KONA Transportes - Protocolo Operacional</title>
+
+<style>
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: linear-gradient(135deg, #0f172a, #020617);
+  color: white;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 20px;
+  background: #0b1220;
+  border-bottom: 2px solid #38bdf8;
+}
+
+.header img {
+  width: 60px;
+  height: 60px;
+  border-radius: 10px;
+  object-fit: cover;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 20px;
+  color: #38bdf8;
+}
+
+.header span {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.card {
+  background: rgba(30,41,59,0.85);
+  padding: 18px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  border: 1px solid #1f2937;
+}
+
+h2, h3 { color: #38bdf8; }
+
+input, select, textarea {
+  width: 100%;
+  padding: 10px;
+  margin: 6px 0;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #0f172a;
+  color: white;
+}
+
+button {
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+.save { background: #f59e0b; color: black; }
+.send { background: #22c55e; color: black; }
+.add { background: #3b82f6; color: white; }
+
+.lojaBox {
+  background:#0b1220;
+  padding:10px;
+  border-radius:10px;
+  margin-top:10px;
+  border:1px solid #1e293b;
+}
+
+.occItem {
+  margin-left:10px;
+  padding-left:10px;
+  border-left:2px solid #334155;
+}
+
+.status {
+  margin-top: 10px;
+  color: #38bdf8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div>
+    <h1>KONA TRANSPORTES</h1>
+    <span>Sistema de Conferência Operacional</span>
+  </div>
+</div>
+
+<div class="container">
+
+<div class="card">
+<h2>Protocolo Diário</h2>
+</div>
+
+<div class="card">
+<h3>Identificação</h3>
+<input id="conferente" placeholder="Conferente">
+<input id="matricula" placeholder="Matrícula">
+<input id="resp" placeholder="Responsável">
+<input type="date" id="data">
+<input id="operador" placeholder="Operador Paleteira">
+<input id="rota" placeholder="Rota">
+</div>
+
+<div class="card">
+<h3>Horários da Operação</h3>
+
+<label>Início da Conferência</label>
+<input type="datetime-local" id="inicio_conf">
+
+<label>Fim da Conferência</label>
+<input type="datetime-local" id="fim_conf">
+
+<label>Início do Carregamento</label>
+<input type="datetime-local" id="inicio_carreg">
+
+<label>Fim do Carregamento</label>
+<input type="datetime-local" id="fim_carreg">
+</div>
+
+<div class="card">
+<h3>TEMPERATURA FOI AFERIDA PELA QUALIDADE</h3>
+
+<select id="temp_check">
+  <option value="">Selecione</option>
+  <option value="sim">SIM</option>
+  <option value="nao">NÃO</option>
+  <option value="parcial">PARCIAL</option>
+</select>
+</div>
+
+<div class="card">
+<h3>Totais por Categoria</h3>
+<input id="cong" placeholder="Congelado">
+<input id="resf" placeholder="Resfriado">
+<input id="mr" placeholder="MR">
+<input id="doce" placeholder="Doce">
+<input id="seco" placeholder="Seco">
+</div>
+
+<div class="card">
+<h3>Motivo do Atraso</h3>
+<select id="motivo">
+<option value="">Selecione</option>
+<option>Perda de palete</option>
+<option>Falta de máquina</option>
+<option>Outros</option>
+</select>
+<input id="outros" placeholder="Se outros...">
+</div>
+
+<div class="card">
+<h3>Ocorrências por Loja</h3>
+<div id="lojas"></div>
+<button class="add" onclick="addLoja()">+ Adicionar Loja</button>
+</div>
+
+<div class="card">
+<h3>Observações</h3>
+<textarea id="obs"></textarea>
+</div>
+
+<div class="card">
+<button class="save" onclick="salvar()">Salvar Offline</button>
+<button class="send" onclick="enviar()">Enviar</button>
+
+<p id="status"></p>
+</div>
+
+</div>
+
+<script>
+  const SUPABASE_URL = "https://bsfxkejvbgphteimxvun.supabase.co";
+
+  const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJzZnhrZWp2YmdwaHRlaW14dnVuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwOTI0NTYsImV4cCI6MjA5MTY2ODQ1Nn0.39AD0Eb2NQphxMl0sS3pRDQ5uGyyOwHCHmiJdHRpkp8";
+
+  
+ let fila = JSON.parse(localStorage.getItem("fila")) || [];
+const statusEl = document.getElementById("status");
+/* TEMP */
+function toggleTemp(){
+  const v = document.getElementById("temp_check").value;
+  const t = document.getElementById("temperatura");
+
+  t.style.display = v === "sim" ? "block" : "none";
+  if(v !== "sim") t.value = "";
+}
+
+/* LOJA */
+function addLoja(){
+  const box = document.createElement("div");
+  box.className = "lojaBox";
+
+  box.innerHTML = `
+    <input placeholder="Loja" class="loja">
+    <div class="occList"></div>
+    <button class="add" onclick="addOcc(this)">+ Ocorrência</button>
+  `;
+
+  document.getElementById("lojas").appendChild(box);
+}
+
+/* OCORRÊNCIA */
+function addOcc(btn){
+  const container = btn.parentElement.querySelector(".occList");
+
+  const div = document.createElement("div");
+  div.className = "occItem";
+
+  div.innerHTML = `
+    <input placeholder="N° OCO" class="oco">
+    <input placeholder="CÓD" class="cod">
+    <input placeholder="DESCRIÇÃO" class="desc">
+    <input placeholder="QTDE" class="qtde">
+  `;
+
+  container.appendChild(div);
+}
+
+/* SALVAR */
+function salvar(){
+
+  const lojas = [];
+
+  document.querySelectorAll(".lojaBox").forEach(l => {
+
+    const ocorrencias = [];
+
+    l.querySelectorAll(".occItem").forEach(o => {
+      ocorrencias.push({
+        oco:o.querySelector(".oco").value,
+        cod:o.querySelector(".cod").value,
+        desc:o.querySelector(".desc").value,
+        qtde:o.querySelector(".qtde").value
+      });
+    });
+
+    lojas.push({
+      loja:l.querySelector(".loja").value,
+      ocorrencias
+    });
+
+  });
+
+const r = {
+  conferente: conferente.value,
+  matricula: matricula.value,
+  resp: resp.value,
+  data: data.value,
+  operador: operador.value,
+  rota: rota.value,
+  inicio_conf: inicio_conf.value,
+  fim_conf: fim_conf.value,
+  inicio_carreg: inicio_carreg.value,
+  fim_carreg: fim_carreg.value,
+  temperatura: temp_check.value,
+  cong: cong.value,
+  resf: resf.value,
+  mr: mr.value,
+  doce: doce.value,
+  seco: seco.value,
+  motivo: motivo.value,
+  obs: obs.value,
+  status: "pendente"
+};
+
+  fila.push(r);
+  localStorage.setItem("fila", JSON.stringify(fila));
+
+  statusEl.innerText = "✔ Salvo offline";
+}
+
+/* ENVIAR */
+async function enviar(){
+
+  const lojas = [];
+
+  document.querySelectorAll(".lojaBox").forEach(l => {
+
+    const ocorrencias = [];
+
+    l.querySelectorAll(".occItem").forEach(o => {
+      ocorrencias.push({
+        oco:o.querySelector(".oco").value,
+        cod:o.querySelector(".cod").value,
+        desc:o.querySelector(".desc").value,
+        qtde:o.querySelector(".qtde").value
+      });
+    });
+
+    lojas.push({
+      loja:l.querySelector(".loja").value,
+      ocorrencias
+    });
+
+  });
+
+  const r = {
+    conferente:conferente.value,
+    matricula:matricula.value,
+    resp:resp.value,
+    data:data.value,
+    operador:operador.value,
+    rota:rota.value,
+    inicio_conf:inicio_conf.value,
+    fim_conf:fim_conf.value,
+    inicio_carreg:inicio_carreg.value,
+    fim_carreg:fim_carreg.value,
+    temperatura: temp_check.value,
+    cong:cong.value,
+    resf:resf.value,
+    mr:mr.value,
+    doce:doce.value,
+    seco:seco.value,
+    motivo:motivo.value,
+    obs:obs.value,
+    lojas:lojas,
+    status:"enviado"
+  };
+
+  try {
+
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/registros_operacao`,
+      {
+        method: "POST",
+        headers: {
+          "apikey": SUPABASE_KEY,
+          "Authorization": `Bearer ${SUPABASE_KEY}`,
+          "Content-Type": "application/json",
+          "Prefer": "return=representation"
+        },
+        body: JSON.stringify(r)
+      }
+    );
+
+    const text = await res.text();
+
+    console.log("STATUS:", res.status);
+    console.log("RESPOSTA:", text);
+
+    if(!res.ok){
+      throw new Error(text);
+    }
+
+    statusEl.innerText = "✔ Enviado com sucesso!";
+
+    // 🔥 LIMPA FORMULÁRIO
+    document.querySelectorAll("input, textarea").forEach(i => i.value = "");
+    document.getElementById("lojas").innerHTML = "";
+
+  } catch(e){
+    console.log("ERRO:", e);
+    statusEl.innerText = "❌ Erro ao enviar!";
+  }
+}
+
+window.addEventListener("online", enviar);
+</script>
+
+</body>
+</html>
