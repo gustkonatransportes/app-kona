@@ -233,7 +233,18 @@ function addOcc(btn){
   div.className = "occItem";
 
   div.innerHTML = `
-    <input placeholder="N° OCO" class="oco">
+    <select class="oco">
+      <option value="">SELECIONE</option>
+      <option>01 - SOBRA</option>
+      <option>02 - FALTA</option>
+      <option>03 - AVARIA DE PRODUTO</option>
+      <option>04 - AVARIA DE EMBALAGEM</option>
+      <option>05 - INVERSÃO DE PRODUTO</option>
+      <option>06 - INVERSÃO DE ROTA</option>
+      <option>07 - ETIQUETAGEM (F)</option>
+      <option>08 - ETIQUETAGEM (D)</option>
+    </select>
+
     <input placeholder="CÓD" class="cod">
     <input placeholder="DESCRIÇÃO" class="desc">
     <input placeholder="QTDE" class="qtde">
