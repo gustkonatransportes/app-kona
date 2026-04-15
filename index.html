@@ -76,7 +76,7 @@ button {
 
 .save { background: #f59e0b; color: black; }
 .send { background: #22c55e; color: black; }
-.add { background: #3b82f6; color: white; }
+.add { background: #2c6dd4; color: white; }
 
 .lojaBox {
   background:#0b1220;
@@ -264,25 +264,26 @@ function salvar(){
   });
 
 const r = {
-  conferente: conferente.value,
-  matricula: matricula.value,
-  resp: resp.value,
-  data: data.value,
-  operador: operador.value,
-  rota: rota.value,
-  inicio_conf: inicio_conf.value,
-  fim_conf: fim_conf.value,
-  inicio_carreg: inicio_carreg.value,
-  fim_carreg: fim_carreg.value,
-  temperatura: temp_check.value,
-  cong: cong.value,
-  resf: resf.value,
-  mr: mr.value,
-  doce: doce.value,
-  seco: seco.value,
-  motivo: motivo.value,
-  obs: obs.value,
-  status: "pendente"
+  conferente: document.getElementById("conferente").value,
+  matricula: document.getElementById("matricula").value,
+  resp: document.getElementById("resp").value,
+  data: document.getElementById("data").value,
+  operador: document.getElementById("operador").value,
+  rota: document.getElementById("rota").value,
+  inicio_conf: document.getElementById("inicio_conf").value,
+  fim_conf: document.getElementById("fim_conf").value,
+  inicio_carreg: document.getElementById("inicio_carreg").value,
+  fim_carreg: document.getElementById("fim_carreg").value,
+  temperatura: document.getElementById("temp_check").value,
+  cong: document.getElementById("cong").value,
+  resf: document.getElementById("resf").value,
+  mr: document.getElementById("mr").value,
+  doce: document.getElementById("doce").value,
+  seco: document.getElementById("seco").value,
+  motivo: document.getElementById("motivo").value,
+  obs: document.getElementById("obs").value,
+  lojas: lojas,
+  status: "enviado"
 };
 
   fila.push(r);
@@ -376,7 +377,7 @@ async function enviar(){
   }
 }
 
-<button class="send" onclick="enviar()">Enviar</button>
+window.addEventListener("online", enviar);
 </script>
 
 </body>
