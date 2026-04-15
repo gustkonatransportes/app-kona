@@ -174,7 +174,7 @@ button {
 <div class="card">
 <h3>Ocorrências por Loja</h3>
 <div id="lojas"></div>
-<button class="add" onclick="addLoja()">+ Adicionar Loja</button>
+<button class="add" id="btnAddLoja">+ Adicionar Loja</button>
 </div>
 
 <div class="card">
@@ -215,7 +215,7 @@ function addLoja(){
   box.innerHTML = `
     <input placeholder="Loja" class="loja">
     <div class="occList"></div>
-    <button class="add" onclick="addOcc(this)">+ Ocorrência</button>
+   <button class="add btn-occ">+ Ocorrência</button>
   `;
 
   document.getElementById("lojas").appendChild(box);
@@ -378,6 +378,19 @@ async function enviar(){
 }
 
 window.addEventListener("online", enviar);
+document.addEventListener("click", function (e) {
+
+  // botão adicionar loja
+  if (e.target && e.target.id === "btnAddLoja") {
+    addLoja();
+  }
+
+  // botão adicionar ocorrência
+  if (e.target && e.target.classList.contains("btn-occ")) {
+    addOcc(e.target);
+  }
+
+});
 </script>
 
 </body>
